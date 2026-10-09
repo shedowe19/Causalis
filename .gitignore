@@ -1,9 +1,6 @@
-/build*/
-/dist/
-__pycache__/
-*.obj
-*.pdb
-*.ilk
-*.exe
-*.o
-causalis-smoke-report.txt
+node_modules/
+dist/
+build/
+vendor/
+test-results/
+*.log

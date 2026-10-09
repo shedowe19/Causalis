@@ -1,4 +1,4 @@
-name: Windows build and test
+name: Chromium Windows build and test
 
 on:
   push:
@@ -9,12 +9,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: windows-${{ github.workflow }}-${{ github.ref }}
+  group: chromium-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   windows:
-    name: Windows x64 (${{ matrix.runner }})
+    name: Chromium Windows x64 (${{ matrix.runner }})
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 20
     strategy:
@@ -29,53 +29,54 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
-      - name: Configure native MSVC build
-        run: cmake -S . -B build -A x64 -DBUILD_TESTING=ON
-
-      - name: Build browser and tests
-        run: cmake --build build --config Release --parallel 2
-
-      - name: Run core and native Windows tests
-        run: ctest --test-dir build -C Release --output-on-failure --no-tests=error --timeout 60 --output-junit "$PWD/build/test-results.xml"
-
-      - name: Validate the built CLI
-        run: python tools/verify_cli.py build/Release/causalis-cli.exe --report build/cli-checks-report.json
-
-      - name: Prepare downloadable application
+      - name: Set up Node 24
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install pinned dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Check source and credential regressions
         run: |
-          New-Item -ItemType Directory -Force dist | Out-Null
-          Copy-Item build/Release/causalis.exe dist/
-          Copy-Item build/Release/causalis-cli.exe dist/
-          Copy-Item README.md, VALIDATION.md dist/
-          Copy-Item samples dist/samples -Recurse
-          Copy-Item docs dist/docs -Recurse
-          Copy-Item windows/README.md dist/WINDOWS.md
+          npm run check
+          if ($LASTEXITCODE -ne 0) { throw 'Syntax checks failed.' }
+          npm test
+          if ($LASTEXITCODE -ne 0) { throw 'Regression tests failed.' }
+      - name: Prepare verified official CLI for tests
+        run: |
+          npm run prepare:client
+          if ($LASTEXITCODE -ne 0) { throw 'Official CLI verification failed.' }
+          & ./vendor/client/bw.exe --version
+          if ($LASTEXITCODE -ne 0) { throw 'Official CLI could not start.' }
+      - name: Test actual development Chromium
+        run: |
+          $env:CAUSALIS_CI_BW_PATH = (Resolve-Path vendor/client/bw.exe).Path
+          $env:CAUSALIS_REPORT_DIR = Join-Path $PWD 'test-results/development'
+          & ./tools/run-smoke.ps1 -Executable (Resolve-Path node_modules/electron/dist/electron.exe).Path -ProjectPath "$PWD"
+      - name: Package Windows browser
+        run: npm run package:windows
+      - name: Test the packaged executable
+        run: |
+          $env:CAUSALIS_CI_BW_PATH = (Resolve-Path vendor/client/bw.exe).Path
+          $env:CAUSALIS_REPORT_DIR = Join-Path $PWD 'test-results/packaged'
+          & ./tools/run-smoke.ps1 -Executable (Resolve-Path dist/Causalis-win32-x64/Causalis.exe).Path
           $commit = git rev-parse HEAD
-          if ($LASTEXITCODE -ne 0) { throw 'Cannot identify the tested commit.' }
-          "Tested source commit: $commit" | Set-Content dist/BUILD.txt
-          Get-FileHash dist/causalis.exe, dist/causalis-cli.exe -Algorithm SHA256 |
-            ForEach-Object { "$($_.Hash)  $(Split-Path $_.Path -Leaf)" } |
-            Set-Content dist/SHA256SUMS.txt
-
-      - name: Upload application after successful tests
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot identify source commit.' }
+          "Tested source commit: $commit" | Set-Content dist/Causalis-win32-x64/BUILD.txt
+          Get-FileHash dist/Causalis-win32-x64/Causalis.exe -Algorithm SHA256 |
+            ForEach-Object { "$($_.Hash)  Causalis.exe" } | Set-Content dist/Causalis-win32-x64/SHA256SUMS.txt
+      - name: Upload browser after successful tests
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: Causalis-${{ matrix.runner }}-x64
-          path: dist/
-          if-no-files-found: error
+          name: Causalis-Chromium-${{ matrix.runner }}-x64
+          path: dist/Causalis-win32-x64/
           retention-days: 14
-
-      - name: Upload test reports even on failure
+          if-no-files-found: error
+      - name: Upload test reports and Chromium screenshots
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: Causalis-test-reports-${{ matrix.runner }}
-          path: |
-            build/test-results.xml
-            build/cli-checks-report.json
-            build/causalis-smoke-report.txt
-            build/Testing/Temporary/LastTest.log
-            build/Testing/Temporary/LastTestsFailed.log
-          if-no-files-found: warn
+          name: Causalis-Chromium-tests-${{ matrix.runner }}
+          path: test-results/
           retention-days: 14
+          if-no-files-found: warn

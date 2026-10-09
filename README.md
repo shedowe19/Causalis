@@ -1,73 +1,58 @@
-# Causalis Browser 0.2.0
+# Causalis 0.3 — Chromium und Bitwarden
 
-Ein Windows-Dokumentbrowser mit einer selbst geschriebenen Engine, eigener experimenteller Skriptlaufzeit und nativer Oberfläche. Dieses zusammenhängende Quellprojekt enthält Beispiele, Tests und Windows-Bauskripte. Der native x64-Build und die automatisierten Windows-Tests sind erfolgreich; es ist noch kein vollständig kompatibler Alltagsbrowser.
+Causalis ist ein Windows-Browser auf Chromium-Basis mit Electron 44.7.0. Webseiten verwenden Chromium und V8: Bilder, moderne CSS-Layouts und JavaScript werden vom regulären Webkern verarbeitet. Die frühere eigene Engine ist durch diesen Ansatz ersetzt; ihr Quellstand bleibt in der Git-Historie erhalten.
 
-[Windows-x64-ZIP herunterladen](https://github.com/shedowe19/Causalis/actions/runs/37914071885/artifacts/11608871200), entpacken und `causalis.exe` starten. Der [geprüfte Run](https://github.com/shedowe19/Causalis/actions/runs/37914071885) enthält beide Windows-Builds und Testberichte. Die Downloadartefakte werden bis zum 23. Oktober 2026 aufbewahrt; danach den Workflow erneut starten.
-
-HTML-Verarbeitung, einfache CSS-Kaskade, Textlayout, Display-Liste, Dokumentadapter und Skriptinterpreter entstehen in unserem eigenen C++20-Code. Chromium, Blink, Gecko, WebKit, CEF, WebView und fremde JavaScript-Interpreter werden nicht eingebettet. Windows GDI liefert die Grafikausgabe und WinHTTP den optionalen HTTPS-Transport.
-
-## Enthaltene Funktionen
-
-| Bereich | Stand in diesem Paket |
-| --- | --- |
-| Eigene Engine | Begrenztes HTML/CSS, Block-/Inline-Textfluss, Links, Herkunfts-IDs und Diagnosen; portabel getestet |
-| Eigene Skriptlaufzeit | JavaScript-Syntax mit Variablen, Ausdrücken, Schleifen, benannten Funktionen, Konsole und sicheren #id-Änderungen; portabel getestet; ausdrücklich lokale Ausführung |
-| Dokumentmodell | Quelltext erhalten, Titel/Text inspizieren, begrenzte sichere Mutationen und passive Leseansicht; portabel getestet |
-| Seitenstände | Passive .causalis-Dateien, erneute Bereinigung beim Import, begrenzter Textvergleich mit Hinweis auf sonstige Textänderungen; portabel getestet |
-| Windows-Oberfläche | Tabs, Zurück/Vorwärts, drei Arbeitsbereiche, Lesezeichen, Suche, Leseansicht, Quellinspektion, Seitenstände und Projektdateien; MSVC-Build und automatisierter Win32-Test auf beiden Windows-Runnern bestanden; interaktive Bedienprüfung offen |
-| HTTPS | Optionaler WinHTTP-Dokumentzugriff, beim Start aus; keine aktiven Seiten-Skripte oder Subressourcen; Windows-Ausführung offen |
-| Bitwarden/Vaultwarden | Begrenzte Verwaltung über separat installierte offizielle bw.exe: Serverwahl, Status, Sync, Sperren; portable Richtlinien getestet und Windows-Bridge kompiliert; echter CLI-/Tresorzugriff ungetestet |
-
-Die besonderen Funktionen verbinden die Dokumentquelle mit ihrer Darstellung: „Warum?“ zeigt die Herkunft gezeichneter Elemente; dieselbe Quelle erzeugt eine passive Leseansicht und vergleichbare Seitenstände. Arbeitsbereiche halten Dokument-Tabs und CLI-Appdaten getrennt. Ein vollständiges Ursachenprotokoll und isolierte Webidentitäten sind weitere Entwicklungsziele.
+**Bitwarden/Vaultwarden ist der einzige Passwortmanager.** Causalis verwendet den offiziellen Bitwarden-CLI als Tresor-Backend und baut weder einen Chromium-Passwortspeicher noch eine eigene Passwortdatenbank ein. Es ist ein unabhängiges Projekt und keine offizielle Bitwarden-Anwendung.
 
 ## Windows starten
 
-Visual Studio mit C++20-Desktopwerkzeugen und Windows SDK verwenden. In der x64 Developer PowerShell:
+Unter [GitHub Actions](https://github.com/shedowe19/Causalis/actions) einen erfolgreichen **Chromium Windows build and test**-Run öffnen, das Artefakt `Causalis-Chromium-windows-latest-x64` herunterladen, vollständig entpacken und `Causalis.exe` starten. Alle Dateien im entpackten Ordner werden benötigt. Das Paket ist eine unsignierte Entwicklungsanwendung ohne Installer und automatische Updates.
+
+Im Tresorbereich **Bitwarden-Client installieren** anklicken. Causalis lädt die unveränderte offizielle OSS-Ausgabe `2026.9.1` von Bitwarden herunter, prüft die festgelegte SHA-256-Prüfsumme und installiert sie in seinem Anwendungsdatenordner. Der Client wird nicht in unserem Downloadpaket weiterverteilt. Alternativ kann eine selbst geprüfte offizielle `bw.exe` ausgewählt werden.
+
+1. Bitwarden USA, Bitwarden Europa oder den HTTPS-Server deines Vaultwarden wählen. Ein Serverwechsel setzt einen abgemeldeten Tresor voraus.
+2. Mit E-Mail, Masterpasswort und gegebenenfalls Zwei-Faktor-Code anmelden. Alternativ mit persönlichem API-Schlüssel anmelden und mit Masterpasswort entsperren.
+3. Eine HTTPS-Anmeldeseite öffnen, passende Einträge laden und einen Eintrag ausdrücklich zum Einfüllen auswählen. Der Browser füllt nur ein eindeutiges sichtbares Anmeldeformular in der Hauptseite aus und sendet es nicht ab.
+4. Neue Zugangsdaten können im Tresorbereich ausdrücklich gespeichert werden; der Passwortgenerator verwendet kryptografische Zufallswerte.
+
+## Funktionen
+
+- Tabs, Suche/Adresszeile, Zurück/Vorwärts, Neuladen und Downloads mit Dateiauswahl.
+- Persönlich, Arbeit und Homelab mit getrennten Website-Sessions und getrennten Bitwarden-CLI-Profilen.
+- Privater Arbeitsbereich mit einer nicht persistenten Website-Session. Der darin verwendete **verschlüsselte CLI-Tresorcache bleibt auf dem Gerät**, bis du ihn separat entfernst.
+- Integrierter Tresor: Anmeldung, Entsperren, Synchronisieren, Sperren, Abmelden, genaue HTTPS-Origin-Zuordnung, Einfüllen, neue Logins und Passwortgenerator.
+- Automatische Tresorsperre nach fünf Minuten ohne relevante Tresoraktivität, beim Arbeitsbereichswechsel, Windows-Sperren, Suspend und Beenden.
+- Websites besitzen keinen Node-Zugriff, keinen privilegierten Preload und keinen Zugriff auf die Tresor-IPC. Chromium-Sandbox, Kontextisolation, Websicherheit und Zertifikatsprüfung bleiben aktiviert.
+
+## Entwicklungsstand und Grenzen
+
+Die Bitwarden-Browsererweiterung wird nicht eingebettet: Electron implementiert nur einen Teil der Chrome-Erweiterungs-APIs. Unsere Oberfläche greift auf den offiziellen nativen Client zu. Biometrie, Passkeys, Organisationseinträge mit erneuter Masterpasswortabfrage, SSO-Oberflächen und automatisches Speichern beim Absenden einer Webseite sind noch nicht integriert. FIDO2/Duo für den CLI-Login erfordern die API-Schlüssel-Alternative. Autofill beschränkt sich bewusst auf die **genaue HTTPS-Origin**, nicht auf alle Subdomains derselben Domain; fremde Frames und fremde Formularziele erhalten keine Zugangsdaten.
+
+Website-Berechtigungen für Kamera, Mikrofon, Standort und Benachrichtigungen sind derzeit standardmäßig verweigert. DRM, Browsererweiterungen und interne PDF-Viewer sind keine zugesicherte Funktion dieses Stands. Es gibt noch keinen signierten Installer oder Updatekanal. Vor echter Tresornutzung sind Login/Sync/Speichern gegen deinen Server praktisch zu prüfen; automatisierte Tests verwenden dafür synthetische Zugangsdaten.
+
+## Entwickeln und prüfen
+
+Node.js 24 und npm verwenden:
 
 ```powershell
-cmake -S . -B build -A x64
-cmake --build build --config Release
-ctest --test-dir build -C Release --output-on-failure
-.\build\Release\causalis.exe
+npm ci
+npm run check
+npm test
+npm start
 ```
 
-Alternativ kompiliert windows/build.ps1 das Programm direkt mit MSVC. Bedienung und ein Windows-Prüfablauf stehen in [windows/README.md](windows/README.md). Das eingebaute Beispieldokument funktioniert ohne externe Dateien; samples/script-demo.html zeigt die ausdrücklich ausgelöste Skriptausführung.
+Windows-Paket und echte Chromium-Prüfung:
 
-Das Projekt enthält auch [.github/workflows/windows.yml](.github/workflows/windows.yml): native Builds und Tests auf windows-latest und windows-2022, ein automatischer Win32-Starttest und EXE-Downloads nach erfolgreicher Prüfung. Am 9. Oktober 2026 bestanden beide Jobs jeweils 7/7 CTest-Ziele und alle 11 CLI-Prüfungen für Quellcommit `3b9d6291d9b6ac8b13e7cc48092f1c68d512def6`. Einrichtung, Runlinks und tatsächliche Prüfabdeckung stehen in [docs/CI.md](docs/CI.md).
-
-## Portablen Kern prüfen
-
-Mit Python 3 und GCC mit C++20-Unterstützung:
-
-```bash
-python3 tools/test_portable.py --build-dir build-portable
-./build-portable/causalis-cli samples/start.html 960 > frame.json
-./build-portable/causalis-cli samples/script-demo.html 640 --run-scripts --source
-./build-portable/causalis-cli samples/start.html 640 --reading
+```powershell
+npm run prepare:client
+$env:CAUSALIS_CI_BW_PATH = (Resolve-Path vendor/client/bw.exe).Path
+$env:CAUSALIS_REPORT_DIR = Join-Path $PWD 'test-results/development'
+npm run smoke
+npm run package:windows
 ```
 
-Der Prüflauf baut den Kern, sechs Prüfprogramme und die JSON-CLI. Mit --sanitize werden AddressSanitizer und UndefinedBehaviorSanitizer aktiviert. --disable-leak-check ist nur für Umgebungen vorgesehen, in denen LeakSanitizer nicht funktioniert; dann besteht kein Leak-Prüfnachweis.
+Der Workflow prüft zusätzlich die **fertige EXE** und lädt nur bei Erfolg das komplette Anwendungsartefakt hoch. Berichte und echte Chromium-Screenshots erscheinen als separate Artefakte. Der Prüfmodus verwendet ausschließlich temporäre Profile; er berührt keine echten Benutzerkonten.
 
-Die CLI akzeptiert lokale UTF-8-Dokumente bis 2 MiB. Standardmäßig bleiben Skripte aus. --run-scripts führt die unterstützten klassischen Inline-Skripte einmal aus; Module, externe Skripte und Ereignishandler bleiben aus. --source ergänzt die resultierende Dokumentquelle. Konsole und Ausführungsdiagnosen sind getrennte JSON-Felder.
+Details: [Architektur](docs/ARCHITECTURE.md), [Tresorgrenzen](docs/VAULT.md), [CI-Prüfung](docs/CI.md), [Prüfstand](VALIDATION.md).
 
-## Grenzen des aktuellen Kerns
-
-HTML-Baumkonstruktion und CSS sind Teilimplementierungen. Der Dokumentadapter ist kein vollständiges HTML5-DOM. Die eigene Skriptsprache ist keine ECMAScript-konforme JavaScript-Engine: keine vollständigen Objekte/Prototypen, Module, Promises, Event Loop oder allgemeinen Web-APIs. DOM-Lesezugriffe kennen nur in derselben Ausführung zuvor geschriebene Werte; fehlende oder inaktive #id-Ziele meldet der Host. Sprachtests und interne Renderertests ersetzen weder Test262 noch Web Platform Tests.
-
-Es fehlen unter anderem interaktive Formulare, Cookies, Webspeicher, Bilder, Flexbox/Grid, Medien, WebGL, WebAuthn, Browsererweiterungen, Installer, signierte Updates und eine Prozesssandbox. Moderne Webapps und echte Anmeldungen sind deshalb kein unterstützter Einsatzzweck dieses Stands. HTTPS ist ein ausdrücklich aktivierbarer Entwicklungsversuch für statische Dokumente.
-
-Die Tresoranbindung beschafft keine Passwörter, führt kein Login/Unlock aus und bietet kein Autofill, Windows Hello oder Passkeys. Die offizielle Erweiterung läuft auf dieser eigenen Engine noch nicht. Einrichtung und genaue Grenzen stehen in [docs/VAULT.md](docs/VAULT.md).
-
-Passive Seitenstände entfernen Skripte, Formulare und aktive Ressourcen, können aber weiterhin private sichtbare Texte und URLs enthalten. Projektdateien speichern die ursprünglichen Dokumentquellen, einschließlich darin vorhandener Skripte und Formulardaten; sie sind kein bereinigtes Austauschformat. CLI-Tresordaten werden nicht darin gesammelt. Projekte starten beim Import keine Skripte und laden keine URLs automatisch.
-
-## Projektstruktur
-
-- src/engine.cpp: eigener Parser, CSS, Textlayout und Paint.
-- src/document.cpp, src/script.cpp, src/page.cpp: Dokumentadapter, Interpreter und Ausführungspolitik.
-- src/checkpoint.cpp, src/vault_policy.cpp: passive Seitenstände und portable CLI-Richtlinien.
-- windows/: native Oberfläche, HTTPS-Helfer und begrenzte CLI-Bridge.
-- tests/, tools/test_portable.py: reproduzierbare Prüfung.
-- docs/ARCHITECTURE.md, docs/PRODUCT.md: bestehende Architektur und weitere Produktziele.
-- VALIDATION.md: tatsächliche Prüfergebnisse und verbleibende Plattformgrenzen.
-
-preview.png zeigt die Display-Liste mit angenäherten Schriftmaßen; es ist kein Windows-Screenshot. tools/preview_frame.py erzeugt solche Debugvorschauen mit Pillow.
+Der Projektcode steht unter GPL-3.0-only. Electron enthält eigene MIT-/Chromium-Drittanbieterhinweise, die im Paket erhalten bleiben. Bitwardens unveränderter OSS-Client wird direkt von dessen offizieller Downloadquelle bezogen; Quellen und Lizenzzuordnung stehen in [THIRD_PARTY.md](THIRD_PARTY.md).
