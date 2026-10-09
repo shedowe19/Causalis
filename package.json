@@ -15,7 +15,10 @@
     "check": "node tools/check.cjs",
     "smoke": "electron . --smoke-test",
     "prepare:client": "node tools/prepare-client.cjs",
-    "package:windows": "node tools/package.cjs"
+    "package:windows": "node tools/package.cjs",
+    "runtime:install": "node node_modules/electron/install.js",
+    "prestart": "npm run runtime:install",
+    "presmoke": "npm run runtime:install"
   },
   "devDependencies": {
     "@electron/fuses": "2.1.3",

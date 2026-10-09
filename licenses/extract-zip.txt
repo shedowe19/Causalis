@@ -1,0 +1,53 @@
+MIT License
+
+Copyright (c) Contributors to the Electron project
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Historical packaging and license declaration
+------------------------------------------
+
+Component: @electron-internal/extract-zip 1.0.5
+Upstream: https://github.com/electron/extract-zip
+Published source: v1.0.5 / b83e459fd04c53b0a1c8438a6792df8f64be47fc
+
+The published 1.0.5 package and its source metadata declared BSD-2-Clause,
+but that revision did not include a LICENSE file. No BSD copyright notice
+has been reconstructed or invented here.
+
+Upstream explicitly relicensed the same program code to MIT in the immediately
+following commit, 3c33b76429ebd9bf724bcfc32d3e8fae7eeb3e82, titled
+"chore: relicense to MIT and add LICENSE file (#19)". The complete upstream
+MIT text is reproduced above without modification.
+
+The comparison between those commits contains exactly four changed files:
+LICENSE was added, and the license declarations in Cargo.toml, package.json
+and README.md changed from BSD-2-Clause to MIT. No program source, bindings,
+build instructions or dependency lock files changed in that comparison.
+The packaged 1.0.5 runtime files remain unmodified; their historical metadata
+may therefore still display BSD-2-Clause.
+
+Relicensing commit:
+https://github.com/electron/extract-zip/commit/3c33b76429ebd9bf724bcfc32d3e8fae7eeb3e82
+
+Exact upstream license:
+https://github.com/electron/extract-zip/blob/3c33b76429ebd9bf724bcfc32d3e8fae7eeb3e82/LICENSE
+
+Source comparison:
+https://github.com/electron/extract-zip/compare/b83e459fd04c53b0a1c8438a6792df8f64be47fc...3c33b76429ebd9bf724bcfc32d3e8fae7eeb3e82

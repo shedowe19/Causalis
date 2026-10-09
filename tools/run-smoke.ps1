@@ -13,7 +13,13 @@ if (-not $process.WaitForExit(120000)) {
     & taskkill.exe /PID $process.Id /T /F | Out-Null
     throw 'Electron smoke test timed out.'
 }
-if ($process.ExitCode -ne 0) { throw "Electron smoke test failed with exit code $($process.ExitCode)." }
+if ($process.ExitCode -ne 0) {
+    foreach ($name in @('report.json','fatal.json','startup.json')) {
+        $diagnostic = Join-Path $env:CAUSALIS_REPORT_DIR $name
+        if (Test-Path -LiteralPath $diagnostic -PathType Leaf) { Get-Content -LiteralPath $diagnostic -Raw | Write-Output }
+    }
+    throw "Electron smoke test failed with exit code $($process.ExitCode)."
+}
 $reportFile = Join-Path $env:CAUSALIS_REPORT_DIR 'report.json'
 if (-not (Test-Path -LiteralPath $reportFile -PathType Leaf)) { throw 'Smoke report was not created.' }
 $report = Get-Content -LiteralPath $reportFile -Raw | ConvertFrom-Json

@@ -132,6 +132,9 @@ async function runSmoke({ app, window, browser, vault, emitState = () => {}, ipc
     finally { row.durationMs = Date.now() - started; }
   };
   const screenshot = async (contents, filename) => {
+    // Electron 44 rejects capturePage before the first compositor surface
+    // exists, even when stayHidden is set. Wait for actual presented frames.
+    await contents.executeJavaScript('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
     const image = await contents.capturePage(undefined, { stayHidden: true });
     assert(!image.isEmpty(), 'Chromium returned an empty screenshot.');
     await fs.writeFile(path.join(reportDir, filename), image.toPNG());
@@ -147,6 +150,9 @@ async function runSmoke({ app, window, browser, vault, emitState = () => {}, ipc
       username: credential.username, password: credential.password });
   };
   const work = async () => {
+    // A never-shown BrowserWindow can execute DOM scripts without producing
+    // a capturable display surface. This is a smoke-only temporary profile.
+    window.showInactive();
     browser.setWorkspace('personal');
     await finishLoad();
     await navigate('/fixture');

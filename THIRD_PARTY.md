@@ -6,7 +6,9 @@ Electron 44.7.0: https://github.com/electron/electron/releases/tag/v44.7.0
 
 Electron steht unter MIT; Chromium und seine Komponenten besitzen zusätzliche Lizenzen. `LICENSE`, `LICENSES.chromium.html`, Ressourcen und Locale-Dateien der offiziellen Electron-Distribution bleiben im Windows-Paket erhalten.
 
-Der integrierte Downloader verwendet Electron's `@electron-internal/extract-zip` 1.0.5 (BSD-2-Clause). Dessen unveränderte Laufzeitdateien und Lizenzhinweise bleiben im Paket erhalten.
+Der integrierte Downloader verwendet Electron's `@electron-internal/extract-zip` 1.0.5. Diese Veröffentlichung deklarierte BSD-2-Clause in den Metadaten, enthielt aber keinen Lizenztext. Upstream hat denselben Programmcode im unmittelbar folgenden Commit ausdrücklich unter MIT gestellt und den vollständigen Lizenztext ergänzt. Der [Quellvergleich](https://github.com/electron/extract-zip/compare/b83e459fd04c53b0a1c8438a6792df8f64be47fc...3c33b76429ebd9bf724bcfc32d3e8fae7eeb3e82) zeigt ausschließlich diese Lizenzänderungen; Programmcode, Builddateien und Abhängigkeits-Lockdateien blieben identisch.
+
+Die unveränderten Laufzeitdateien und der vollständige originale MIT-Text samt historischer BSD-Deklarationsnotiz in [licenses/extract-zip.txt](licenses/extract-zip.txt) werden mitgeliefert. Die Copyright-Zeile stammt aus der [Upstream-Lizenz am Relizenzierungscommit](https://github.com/electron/extract-zip/blob/3c33b76429ebd9bf724bcfc32d3e8fae7eeb3e82/LICENSE); eine BSD-Copyright-Zeile wurde nicht ergänzt. Die historischen Paketmetadaten können weiterhin BSD-2-Clause anzeigen.
 
 ## Bitwarden
 

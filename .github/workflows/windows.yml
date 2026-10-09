@@ -35,7 +35,11 @@ jobs:
           node-version: '24'
           cache: npm
       - name: Install pinned dependencies
-        run: npm ci --no-audit --no-fund
+        run: |
+          npm ci --no-audit --no-fund
+          if ($LASTEXITCODE -ne 0) { throw 'Dependency installation failed.' }
+          node node_modules/electron/install.js
+          if ($LASTEXITCODE -ne 0) { throw 'Electron runtime installation failed.' }
       - name: Check source and credential regressions
         run: |
           npm run check
@@ -46,8 +50,10 @@ jobs:
         run: |
           npm run prepare:client
           if ($LASTEXITCODE -ne 0) { throw 'Official CLI verification failed.' }
+          $env:BITWARDENCLI_APPDATA_DIR = Join-Path $env:RUNNER_TEMP 'causalis-cli-version'
           & ./vendor/client/bw.exe --version
           if ($LASTEXITCODE -ne 0) { throw 'Official CLI could not start.' }
+          Remove-Item Env:BITWARDENCLI_APPDATA_DIR
       - name: Test actual development Chromium
         run: |
           $env:CAUSALIS_CI_BW_PATH = (Resolve-Path vendor/client/bw.exe).Path

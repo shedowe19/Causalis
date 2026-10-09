@@ -2,7 +2,7 @@
 
 Der Workflow `.github/workflows/windows.yml` verwendet `runs-on` mit `windows-latest` und `windows-2022`. Er startet bei Push, Pull Request oder manuell. Beide Jobs führen dieselben Schritte aus:
 
-1. Gepinnte Node-/Electron-Abhängigkeiten mit `npm ci` installieren.
+1. Gepinnte Node-/Electron-Abhängigkeiten mit `npm ci` installieren und die Electron-Laufzeit explizit mit `npm run runtime:install` bereitstellen.
 2. JavaScript-Syntax und Node-Regressionstests für IPC, Tresor- und Autofill-Grenzen prüfen.
 3. Die offizielle OSS-CLI ausschließlich für Tests herunterladen und ihre festgelegte SHA-256 prüfen. Keine Benutzerkonten oder Tresorgeheimnisse werden benötigt.
 4. Das echte Electron mit temporärem Profil starten: Chromium-Rendering, Bilder, CSS/JavaScript, Sandbox, Tabs/History, Workspace-Cookies, UI-IPC, originbezogenes Autofill und CLI-Status prüfen.

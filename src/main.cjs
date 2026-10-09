@@ -194,7 +194,13 @@ async function bootstrap() {
     }
   }
 }
-app.whenReady().then(bootstrap).catch(()=>{console.error('Causalis could not start.');app.exit(1);});
+app.whenReady().then(bootstrap).catch(error=>{
+  if (smoke) {
+    fs.mkdirSync(reportDir,{recursive:true});
+    fs.writeFileSync(path.join(reportDir,'startup.json'),JSON.stringify({passed:false,error:String(error.message || 'Startup failed').slice(0,1000)},null,2));
+  }
+  console.error('Causalis could not start.');app.exit(1);
+});
 app.on('window-all-closed',()=>app.quit());
 app.on('before-quit',(event)=>{
   if (closing || !vault || smoke) return;
