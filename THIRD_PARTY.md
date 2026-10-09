@@ -6,6 +6,8 @@ Electron 44.7.0: https://github.com/electron/electron/releases/tag/v44.7.0
 
 Electron steht unter MIT; Chromium und seine Komponenten besitzen zusätzliche Lizenzen. `LICENSE`, `LICENSES.chromium.html`, Ressourcen und Locale-Dateien der offiziellen Electron-Distribution bleiben im Windows-Paket erhalten.
 
+Der integrierte Downloader verwendet Electron's `@electron-internal/extract-zip` 1.0.5 (BSD-2-Clause). Dessen unveränderte Laufzeitdateien und Lizenzhinweise bleiben im Paket erhalten.
+
 ## Bitwarden
 
 Der Browser-Download enthält keine Bitwarden-Binärdatei. „Bitwarden-Client installieren“ lädt beim Nutzer die unveränderte offizielle OSS-Ausgabe herunter:

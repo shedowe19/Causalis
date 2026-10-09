@@ -242,6 +242,17 @@ test('controller isolates workspace sessions, denies privileged resources and re
     browser.setWorkspace('personal');
     assert.equal(browser.activeTarget().id, target.id);
     assert.equal(views.length, 1);
+    for (let count = 1; count < 50; ++count) browser.createTab();
+    await browser.lastLoad;
+    const fullTarget = browser.activeTarget();
+    let prevented = 0;
+    for (let count = 0; count < 3; ++count) {
+      assert.doesNotThrow(() => fullTarget.webContents.emit('before-input-event',
+        { preventDefault() { ++prevented; } }, { type: 'keyDown', key: 't', control: true }));
+    }
+    assert.equal(browser.snapshot().tabs.length, 50);
+    assert.equal(prevented, 0);
+    assert.equal(browser.snapshot().activeTab.error, 'Die Browseraktion konnte nicht ausgeführt werden.');
   } finally {
     browser?.destroy();
     Module._load = originalLoad;

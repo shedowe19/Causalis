@@ -162,7 +162,13 @@ class BrowserController {
       if (isMainFrame && code !== -3) { tab.loading = false; tab.error = `Die Seite konnte nicht geladen werden (${code}).`; this.emit(); }
     });
     contents.on('render-process-gone', () => { ++tab.epoch; tab.loading = false; tab.error = 'Der Seitenprozess wurde beendet. Bitte lade den Tab neu.'; this.emit(); });
-    contents.on('before-input-event', (event, input) => this.keyboard(event, input));
+    contents.on('before-input-event', (event, input) => {
+      try { this.keyboard(event, input); }
+      catch {
+        tab.error = 'Die Browseraktion konnte nicht ausgeführt werden.';
+        this.emit();
+      }
+    });
   }
 
   updateTab(tab) {

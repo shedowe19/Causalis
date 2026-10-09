@@ -28,7 +28,7 @@ function installProtocol(target, trustedUi = false) {
     if (trustedUi && url.host === 'ui' && ['/index.html','/app.js','/styles.css'].includes(url.pathname)) filename = url.pathname.slice(1);
     if (!trustedUi && url.host === 'start' && (url.pathname === '/' || url.pathname === '/index.html')) filename = 'start.html';
     if (!filename || request.method !== 'GET' || url.username || url.password || url.search) return new Response('Not found', {status:404});
-    return new Response(fs.readFileSync(path.join(uiRoot, filename)), {headers:{'Content-Type':MIME[path.extname(filename)], 'Content-Security-Policy':trustedUi ? CSP : "default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; frame-src 'none'", 'X-Content-Type-Options':'nosniff'}});
+    return new Response(fs.readFileSync(path.join(uiRoot, filename)), {headers:{'Content-Type':MIME[path.extname(filename)], 'Content-Security-Policy':trustedUi ? CSP : "default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action https://duckduckgo.com; frame-src 'none'", 'X-Content-Type-Options':'nosniff'}});
   });
   target.setPermissionRequestHandler((_contents,_permission,callback)=>callback(false));
   target.setPermissionCheckHandler(()=>false);
@@ -169,8 +169,12 @@ async function bootstrap() {
   window.on('closed',()=>{browser.destroy();window=null;});
   powerMonitor.on('suspend',()=>{++vaultEpoch;vault.lock().catch(()=>{});});
   powerMonitor.on('lock-screen',()=>{++vaultEpoch;vault.lock().catch(()=>{});});
+  const browserMenu = action => () => {
+    try {Promise.resolve(action()).catch(()=>{notice='Die Browseraktion konnte nicht abgeschlossen werden.';emitState();});}
+    catch {notice='Die Browseraktion konnte nicht abgeschlossen werden.';emitState();}
+  };
   Menu.setApplicationMenu(Menu.buildFromTemplate([
-    {label:'Datei',submenu:[{label:'Neuer Tab',accelerator:'CmdOrCtrl+T',click:()=>browser.createTab()},{label:'Tab schließen',accelerator:'CmdOrCtrl+W',click:()=>browser.closeTab(browser.activeTarget()?.id)},{type:'separator'},{role:'quit',label:'Beenden'}]},
+    {label:'Datei',submenu:[{label:'Neuer Tab',accelerator:'CmdOrCtrl+T',click:browserMenu(()=>browser.createTab())},{label:'Tab schließen',accelerator:'CmdOrCtrl+W',click:browserMenu(()=>browser.closeTab(browser.activeTarget()?.id))},{type:'separator'},{role:'quit',label:'Beenden'}]},
     {label:'Bearbeiten',submenu:[{role:'undo',label:'Rückgängig'},{role:'redo',label:'Wiederholen'},{type:'separator'},{role:'cut',label:'Ausschneiden'},{role:'copy',label:'Kopieren'},{role:'paste',label:'Einfügen'},{role:'selectAll',label:'Alles auswählen'}]},
     {label:'Tresor',submenu:[{label:'Sofort sperren',accelerator:'CmdOrCtrl+Shift+L',click:()=>{++vaultEpoch;vault.lock().then(refreshVault).catch(()=>{});}}]},
     {label:'Ansicht',submenu:[{role:'togglefullscreen',label:'Vollbild'},{label:'Neu laden',accelerator:'CmdOrCtrl+R',click:()=>browser.reload()}]}

@@ -5,9 +5,6 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const {Readable, Transform} = require('node:stream');
 const {pipeline} = require('node:stream/promises');
-const {execFile} = require('node:child_process');
-const {promisify} = require('node:util');
-const runFile = promisify(execFile);
 const CLIENT = Object.freeze({version:'2026.9.1', url:'https://github.com/bitwarden/clients/releases/download/cli-v2026.9.1/bw-oss-windows-2026.9.1.zip',sha256:'c39d346239d926ad7955d1ee7acddf557ff216f3186b5383f40acc402f1adefe',sourceCommit:'8246ae9c9a484a0a69f8b27203034555fb872523'});
 const destinationRoot = root => path.join(root,'client');
 const clientDestination = root => path.join(destinationRoot(root),'bw.exe');
@@ -34,6 +31,7 @@ async function install(root) {
   const extracted = path.join(stage,'unpacked');
   const abort = new AbortController();
   const timeout = setTimeout(()=>abort.abort(),90000);
+  let phase = 'download';
   try {
     const response = await fetch(CLIENT.url,{signal:abort.signal});
     if (!response.ok || !response.body) throw new Error('Download failed');
@@ -45,13 +43,13 @@ async function install(root) {
       hash.update(chunk); done(null,chunk);
     }});
     await pipeline(Readable.fromWeb(response.body),limit,fs.createWriteStream(archive,{flags:'wx'}));
+    phase = 'checksum';
     if (hash.digest('hex') !== CLIENT.sha256) throw new Error('Checksum mismatch');
     clearTimeout(timeout);
-    const powershell = path.join(process.env.SystemRoot || 'C:\\Windows','System32','WindowsPowerShell','v1.0','powershell.exe');
-    const env = {};
-    for (const [key,value] of Object.entries(process.env)) if (['SYSTEMROOT','WINDIR','TEMP','TMP'].includes(key.toUpperCase())) env[key.toUpperCase()]=value;
-    env.PSModulePath = path.join(process.env.SystemRoot || 'C:\\Windows','System32','WindowsPowerShell','v1.0','Modules');
-    await runFile(powershell,['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',path.join(__dirname,'extract-client.ps1'),archive,extracted],{env,windowsHide:true,timeout:30000,maxBuffer:65536,shell:false});
+    phase = 'extract';
+    const {extract} = await import('@electron-internal/extract-zip');
+    await extract(archive,{dir:extracted});
+    phase = 'install';
     const executable = path.join(extracted,'bw.exe');
     const stat = await fsp.lstat(executable);
     if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 192 * 1024 * 1024 || stat.size < 2) throw new Error('Invalid executable');
@@ -62,8 +60,10 @@ async function install(root) {
     await fsp.copyFile(executable,target);
     await fsp.writeFile(path.join(base,'client.json'),JSON.stringify({version:CLIENT.version,sha256,downloadSha256:CLIENT.sha256,sourceCommit:CLIENT.sourceCommit},null,2));
     return {path:target,sha256,version:CLIENT.version};
-  } catch {
-    throw new Error('Der geprüfte Bitwarden-Download ist fehlgeschlagen. Bitte Verbindung prüfen und erneut versuchen.');
+  } catch (error) {
+    const failure = new Error('Der geprüfte Bitwarden-Client konnte nicht installiert werden. Bitte erneut versuchen.');
+    failure.diagnostics = {phase,code:String(error.code || error.name || 'INSTALL_FAILED'),detail:String(error.message || '').slice(0,1000)};
+    throw failure;
   } finally {
     clearTimeout(timeout);
     abort.abort();
