@@ -6,6 +6,8 @@ Causalis ist ein Windows-Browser auf Chromium-Basis mit Electron 44.7.0. Webseit
 
 ## Windows starten
 
+Geprüfte Windows-Version: [Causalis-Chromium-windows-latest-x64 herunterladen](https://github.com/shedowe19/Causalis/actions/runs/37918949653/artifacts/11610474845). [Erfolgreicher Windows-Run](https://github.com/shedowe19/Causalis/actions/runs/37918949653) · [Testberichte und Screenshots](https://github.com/shedowe19/Causalis/actions/runs/37918949653/artifacts/11611340048). Beide Windows-Runner bestehen 32 Regressionstests sowie je 16 echte Chromium-Tests im Entwicklungsstand und in der fertigen EXE. Artefakte sind für 14 Tage verfügbar und können eine GitHub-Anmeldung erfordern.
+
 Unter [GitHub Actions](https://github.com/shedowe19/Causalis/actions) einen erfolgreichen **Chromium Windows build and test**-Run öffnen, das Artefakt `Causalis-Chromium-windows-latest-x64` herunterladen, vollständig entpacken und `Causalis.exe` starten. Alle Dateien im entpackten Ordner werden benötigt. Das Paket ist eine unsignierte Entwicklungsanwendung ohne Installer und automatische Updates.
 
 Im Tresorbereich **Bitwarden-Client installieren** anklicken. Causalis lädt die unveränderte offizielle OSS-Ausgabe `2026.9.1` von Bitwarden herunter, prüft die festgelegte SHA-256-Prüfsumme und installiert sie in seinem Anwendungsdatenordner. Der Client wird nicht in unserem Downloadpaket weiterverteilt. Alternativ kann eine selbst geprüfte offizielle `bw.exe` ausgewählt werden.
