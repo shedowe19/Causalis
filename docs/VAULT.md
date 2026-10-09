@@ -2,7 +2,7 @@
 
 Causalis 0.2 includes an original Windows bridge to a **separately installed, official native Bitwarden `bw.exe`**. It is a limited bridge for status, server configuration, encrypted synchronization, locking, and logout. It is not a complete vault client and does not implement autofill, passkeys, Windows Hello, login, unlock, or password retrieval. The custom browser engine cannot run the official Bitwarden browser extension.
 
-The native Windows bridge has not been compiled or exercised on Windows in this environment. Portable policy tests exercise origin validation, command allowlisting, status parsing and account-field removal. A Windows runtime check with a non-production test vault is required before treating the bridge as working on an installed machine.
+The native Windows bridge was successfully compiled with MSVC on both `windows-latest` and `windows-2022` in the [2026-10-09 Windows run](https://github.com/shedowe19/Causalis/actions/runs/37914071885), using source commit `3b9d6291d9b6ac8b13e7cc48092f1c68d512def6`. Both runners passed all seven CTest targets, including the native UI smoke test and the portable policy tests for origin validation, command allowlisting, status parsing and account-field removal. The native smoke test does not invoke `bw.exe` or access a vault: real bridge operations, login state, server compatibility and Windows process/path handling still require runtime checks with a non-production test vault before treating the integration as working on an installed machine.
 
 ## What each operation means
 

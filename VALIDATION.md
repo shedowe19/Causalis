@@ -1,6 +1,6 @@
 # Ausgeführte Prüfung — 9. Oktober 2026
 
-Causalis 0.2 wurde mit GCC/C++20 in Linux gebaut und ausgeführt. Die native Windows-Oberfläche, WinHTTP und CLI-Prozessbridge wurden unabhängig am Quellcode geprüft. Mangels Windows-Toolchain wurden sie nicht nativ kompiliert oder gestartet. Dieses Paket enthält keine geprüfte Windows-EXE.
+Causalis 0.2 wurde mit GCC/C++20 in Linux und nativ mit MSVC/x64 auf den GitHub-Runnern `windows-latest` und `windows-2022` gebaut und ausgeführt. Beide Windows-Jobs im [Run 37914071885](https://github.com/shedowe19/Causalis/actions/runs/37914071885) waren erfolgreich. Geprüfter Quellcommit: `3b9d6291d9b6ac8b13e7cc48092f1c68d512def6`. Die EXE-ZIPs stammen aus diesem Run; spätere Dokumentationskorrekturen ändern den geprüften Programmcode nicht.
 
 ## Ergebnisse
 
@@ -17,8 +17,9 @@ Causalis 0.2 wurde mit GCC/C++20 in Linux gebaut und ausgeführt. Die native Win
 | CLI | Drei Beispiele in je drei Modi als JSON geprüft; Skriptlabor berechnet 15; ungültiges UTF-8 und ungültige Breite zurückgewiesen |
 | AddressSanitizer / UndefinedBehaviorSanitizer | Gesamter portabler Prüflauf erfolgreich; keine gemeldeten Fehler |
 | Debugvorschau | Aus der eigenen Display-Liste erzeugt und visuell geprüft; kein Windows-Screenshot |
-| Windows / MSVC / PowerShell / CMake | Quellcode geprüft; Build und Ausführung nicht vorgenommen |
-| GitHub-Actions-Windowsprüfung | Workflow für windows-latest und windows-2022 sowie native Startprüfung vorbereitet; kein Run gestartet |
+| Windows / MSVC / PowerShell / CMake | Native x64-Release-Builds auf windows-latest und windows-2022 erfolgreich; PowerShell-Verpackung und Upload erfolgreich; alternatives windows/build.ps1 nicht ausgeführt |
+| GitHub-Actions-Windowsprüfung | Beide Jobs erfolgreich; jeweils 7/7 CTest-Ziele einschließlich windows-native-smoke bestanden, dazu 9 CLI-Beispielmodi und 2 Prüfungen ungültiger Eingaben |
+| Nativer Windows-Smoke-Test | Verborgenes Win32-Fenster, Controls, eigenes Rendering/GDI, lokale UTF-8-Datei und Skriptmutation, Suche, Leseansicht, Quellinspektion, Navigation, Tabs und Arbeitsbereiche auf beiden Runnern geprüft |
 | Reale HTTPS-Dienste und echter Bitwarden-/Vaultwarden-Tresor | Nicht praktisch getestet |
 | Web Platform Tests / Test262 / Sandbox / Autofill | Nicht ausgeführt beziehungsweise noch nicht implementiert |
 
@@ -32,7 +33,7 @@ Neue Integrationsprüfungen führten zu Attributanzahl-/Allokationslimits, siche
 
 Der Vergleich meldet auch Textänderungen jenseits abgeschnittener Vergleichszeilen und reine Reihenfolgeänderungen. Darstellungsprefixe enden an UTF-8-Grenzen. Beim Projektimport bleibt serialisierte Herkunft unprivilegiert; die Datei kann keine lokale Skriptfreigabe übertragen.
 
-Die Windows-Quellprüfung behandelte überholte Navigationsergebnisse, Quell-IDs/Titel geschlossener oder Hintergrund-Tabs, Tastaturbefehle und Timer-Reentranz beim Tresorergebnis. Die CLI-Bridge verwendet explizite lokale Pfade, gepinnte Dateisystemkomponenten, eine feste Befehlsliste, eingeschränkte Umgebung/Handles, Ausgabe-/Zeitgrenzen und verwirft rohe Ausgaben. Diese Windows-Maßnahmen sind noch praktisch zu prüfen; der Status-vor-Serverwechsel ist gegenüber externen CLI-Prozessen nicht atomar.
+Die Windows-Quellprüfung behandelte überholte Navigationsergebnisse, Quell-IDs/Titel geschlossener oder Hintergrund-Tabs, Tastaturbefehle und Timer-Reentranz beim Tresorergebnis. Die CLI-Bridge verwendet explizite lokale Pfade, gepinnte Dateisystemkomponenten, eine feste Befehlsliste, eingeschränkte Umgebung/Handles, Ausgabe-/Zeitgrenzen und verwirft rohe Ausgaben. Sie wurde nativ kompiliert; ihre tatsächlichen Prozess- und Tresorzugriffe bleiben praktisch zu prüfen. Der Status-vor-Serverwechsel ist gegenüber externen CLI-Prozessen nicht atomar.
 
 ## Wiederholen
 
@@ -41,4 +42,4 @@ python3 tools/test_portable.py --build-dir build-portable
 python3 tools/test_portable.py --sanitize --build-dir build-sanitized
 ```
 
-Nur bei nicht funktionierender LeakSanitizer-Unterstützung den zweiten Befehl um --disable-leak-check ergänzen. Auf Windows CMake/CTest und den Prüfablauf aus [windows/README.md](windows/README.md) durchführen. Die Ergebnisse müssen vor einer Windows-Freigabe ergänzt werden.
+Nur bei nicht funktionierender LeakSanitizer-Unterstützung den zweiten Befehl um --disable-leak-check ergänzen. Auf Windows CMake/CTest und den Prüfablauf aus [windows/README.md](windows/README.md) durchführen oder den GitHub-Workflow erneut starten. Vor einer Freigabe als Alltagsbrowser fehlen insbesondere interaktive Bedien-/Accessibility-Prüfungen, reale HTTPS- und Tresortests, Webstandardkompatibilität und eine Prozesssandbox.

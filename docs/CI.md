@@ -18,7 +18,7 @@ Der Workflow startet bei Push und Pull Request. Für den manuellen Start muss de
 
 ## Downloads und Fehler
 
-Ein erfolgreicher Run bietet `Causalis-windows-latest-x64` und `Causalis-windows-2022-x64` unter **Artifacts**. Nach dem Entpacken `causalis.exe` starten. Es ist eine unsignierte Entwicklungsanwendung, kein Installer und kein Nachweis vollständiger Webkompatibilität.
+Der erfolgreiche [Run 37914071885](https://github.com/shedowe19/Causalis/actions/runs/37914071885) bietet die ZIPs [Causalis-windows-latest-x64](https://github.com/shedowe19/Causalis/actions/runs/37914071885/artifacts/11608871200) und [Causalis-windows-2022-x64](https://github.com/shedowe19/Causalis/actions/runs/37914071885/artifacts/11609310132) unter **Artifacts**. Nach dem Entpacken `causalis.exe` starten. Es ist eine unsignierte Entwicklungsanwendung, kein Installer und kein Nachweis vollständiger Webkompatibilität. Diese Artefakte laufen am 23. Oktober 2026 ab; ein neuer erfolgreicher Run erzeugt neue Downloads.
 
 Alle MSVC-Ziele verwenden einheitlich die statische C/C++-Laufzeit (/MT in Release), damit diese Laufzeit nicht als zusätzliche DLL-Installation vorausgesetzt wird. Ein Runner-Ergebnis ersetzt trotzdem keine Prüfung auf einer sauberen Windows-Installation.
 
@@ -26,9 +26,9 @@ Testberichte werden auch bei Fehlern separat hochgeladen: CTest-JUnit, CLI-Beric
 
 ## Verifikation und Grenzen
 
-Die Workflowdatei und die neuen Prüfpfade sind vorbereitet und am Quellcode geprüft. Ein erfolgreiches Windows-Ergebnis darf erst nach einem tatsächlich abgeschlossenen GitHub-Run mit passendem Quellcommit dokumentiert werden. Dieses Paket allein enthält keinen solchen Run und keine Windows-EXE.
+Am 9. Oktober 2026 wurden beide Jobs für Quellcommit `3b9d6291d9b6ac8b13e7cc48092f1c68d512def6` erfolgreich abgeschlossen. Je Runner bestanden 7/7 CTest-Ziele einschließlich des nativen Win32-Tests und zusätzlich 9 CLI-Beispielmodi sowie 2 Prüfungen ungültiger Eingaben. Beide Anwendungs-ZIPs und beide Testbericht-Artefakte wurden hochgeladen. `BUILD.txt` in jedem Anwendungs-ZIP hält den getesteten Quellcommit fest.
 
-Die Prüfung ersetzt keine interaktive Accessibility-/Bedienprüfung, echte HTTPS-Tests, Bitwarden-/Vaultwarden-Testkonten oder einen Sandboxnachweis. Sie schließt die bisher fehlende native Build- und grundlegende Startprüfung, sobald sie im Zielrepository ausgeführt wird.
+Die Prüfung ersetzt keine interaktive Accessibility-/Bedienprüfung, echte HTTPS-Tests, Bitwarden-/Vaultwarden-Testkonten oder einen Sandboxnachweis. Der abgeschlossene Run belegt den nativen Build und die grundlegende Windows-Ausführung für den angegebenen Quellcommit. Nachfolgende reine Dokumentationskorrekturen wurden mit `[skip ci]` veröffentlicht und verändern keine Programm- oder Workflowdateien.
 
 Die Actions-Versionen sind auf verifizierte Release-Commits festgelegt. Der Workflow benötigt nur lesenden Repositoryzugriff und keine Tresorgeheimnisse. Artefakte werden 14 Tage aufbewahrt.
 

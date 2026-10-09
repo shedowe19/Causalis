@@ -29,11 +29,11 @@ Der gemeinsame Seitenpfad akzeptiert höchstens 2 MiB Quelle, 256 Änderungen un
 
 Seitenstände entstehen aus der erzeugten passiven Leseansicht. Der Decoder prüft das Längenformat und bereinigt die gespeicherte Quelle erneut. Der Vergleich nutzt Textzeilen bis 2048 Zeilen und 4096 Byte pro Zeile; sonstige Textänderungen erhalten einen Hinweis. Er rekonstruiert weder JavaScript-Zustand noch Serveraktionen. Projektdateien halten dagegen unveränderte Dokumentquellen und werden beim Import passiv behandelt.
 
-Navigationsergebnisse tragen eindeutige Tab-IDs und Generationen. Die UI übernimmt nur noch gültige Antworten aus einer besitzenden Ergebnisqueue. Die Windows-Quelldateien wurden unabhängig geprüft, aber noch nicht nativ kompiliert oder ausgeführt.
+Navigationsergebnisse tragen eindeutige Tab-IDs und Generationen. Die UI übernimmt nur noch gültige Antworten aus einer besitzenden Ergebnisqueue. Die Windows-Quelldateien wurden unabhängig geprüft und am 2026-10-09 mit MSVC auf `windows-latest` und `windows-2022` nativ kompiliert. Auf beiden Runnern bestanden alle sieben CTest-Ziele einschließlich des automatischen nativen UI-/GDI-Smoke-Tests sowie neun CLI-Beispielmodi und zwei Prüfungen ungültiger CLI-Eingaben. Der [Windows-Run](https://github.com/shedowe19/Causalis/actions/runs/37914071885) prüft Quellstand `3b9d6291d9b6ac8b13e7cc48092f1c68d512def6`. Er enthält keine echten HTTPS- oder Tresoroperationen und ersetzt keine sichtbare UI- oder Accessibility-Prüfung.
 
 ## M0: Nachweisbarer eigener Renderer
 
-Aktuelles Paket: begrenzter HTML-/CSS-Umfang, Textfluss, Display-Liste, Diagnosen, Dokumentadapter, eigener Interpreter, JSON-CLI und erweiterter nativer Windows-Host als Quellcode. Die portablen Algorithmen werden separat und integriert getestet. Die Windows-Ausgabe muss zusätzlich auf Windows geprüft werden.
+Aktuelles Paket: begrenzter HTML-/CSS-Umfang, Textfluss, Display-Liste, Diagnosen, Dokumentadapter, eigener Interpreter, JSON-CLI und erweiterter nativer Windows-Host mit erfolgreich gebautem Windows-x64-Artefakt. Die portablen Algorithmen werden separat und integriert getestet; der Windows-Host hat zusätzlich den beschriebenen automatischen nativen Smoke-Test bestanden. Weitere Plattform-, Netzwerk- und Kompatibilitätsprüfungen bleiben offen.
 
 Erfolgskriterium: Die eigene Implementierung erzeugt für erklärte Testdokumente reproduzierbare Struktur- und Layoutausgaben; malformed und begrenzte Eingaben erzeugen keine undefinierten Zugriffe in den ausgeführten Prüfungen. Das ist kein allgemeiner Sicherheitsnachweis.
 

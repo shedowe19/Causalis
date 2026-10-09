@@ -11,7 +11,7 @@ powershell -ExecutionPolicy Bypass -File windows\build.ps1
 .\build-windows\causalis.exe
 ```
 
-Alternativ über die CMake-Ziele des Hauptprojekts bauen. Der Windows-Host wurde in der Linux-Entwicklungsumgebung nicht ausgeführt; ein Windows-Smoke-Test ist vor Alltagseinsatz erforderlich.
+Alternativ über die CMake-Ziele des Hauptprojekts bauen. Der Windows-Host wurde am 2026-10-09 mit MSVC auf den GitHub-Runnern `windows-latest` und `windows-2022` erfolgreich nativ gebaut und automatisch ausgeführt. Für Quellstand `3b9d6291d9b6ac8b13e7cc48092f1c68d512def6` bestanden auf beiden Runnern alle sieben CTest-Ziele einschließlich `windows-native-smoke` sowie neun CLI-Beispielmodi und zwei Prüfungen ungültiger CLI-Eingaben: [Windows build and test](https://github.com/shedowe19/Causalis/actions/runs/37914071885). Sichtbare Bedienung, HTTPS und echte Tresoroperationen bleiben gesondert zu prüfen.
 
 ## Bedienung
 
@@ -69,13 +69,13 @@ Der Windows-Client besitzt einen nicht interaktiven Prüfmodus:
 
 Für einen zuverlässigen Prozess-Wait im CI den CTest-Test `windows-native-smoke` auf einem Windows-Runner verwenden. Der Modus erzeugt ein echtes, unsichtbares Win32-Fenster mit allen nativen Controls. Er prüft die eigene Darstellung und GDI-Textmessung, Tab-Kommandos wie bei Tastenkürzeln, eine temporäre lokale UTF-8-Datei, explizite Skriptänderungen, Suche, Leseansicht, klickbare Quelleninspektion, Größenänderung, Offscreen-GDI-Pixel, Zurück/Vorwärts und die Trennung der Arbeitsbereiche. Er prüft außerdem, dass Netzwerk-, passive und importierte Dokumente keine lokalen Skripte ausführen dürfen.
 
-Es gibt dabei keine Dialoge, HTTPS-Anfragen, Tresorzugriffe oder Änderungen an echten Arbeitsbereichsspeichern. Das Fenster und die temporäre Datei werden wieder entfernt. Ein echter Testbericht entsteht erst bei Ausführung in Windows.
+Es gibt dabei keine Dialoge, HTTPS-Anfragen, Tresorzugriffe oder Änderungen an echten Arbeitsbereichsspeichern. Das Fenster und die temporäre Datei werden wieder entfernt. Der oben verlinkte Windows-Run hat diesen Modus auf beiden Runnern erfolgreich ausgeführt; die Testberichte stehen in den jeweiligen `Causalis-test-reports-*`-Artefakten.
 
 Exitcodes: **0** bestanden, **1** Initialisierung fehlgeschlagen, **2** native Prüfung fehlgeschlagen. `causalis-smoke-report.txt` wird im Arbeitsverzeichnis geschrieben; verfügbare geerbte Standardausgaben erhalten denselben Bericht. Der Test prüft die verborgene native UI und GDI-Zeichnung; er ersetzt keine visuelle Prüfung eines sichtbaren Fensters, Netzwerk-Kompatibilitätstests oder echte Bitwarden-Anmelde-/Autofilltests.
 
-## Windows-Smoke-Test
+## Noch ausstehende manuelle Windows-Prüfungen
 
-Nach einem erfolgreichen Build prüfen:
+Die automatischen Prüfungen ersetzen folgende manuelle und integrationsbezogene Prüfungen nicht:
 
 1. Beispiel öffnen, Fenster vergrößern/verkleinern, scrollen, Tabs erstellen und schließen.
 2. Lokale `samples`-Dateien öffnen; Zurück/Vorwärts, Lesen, Suche und Inspektion prüfen.

@@ -1,6 +1,8 @@
 # Causalis Browser 0.2.0
 
-Ein Windows-Dokumentbrowser mit einer selbst geschriebenen Engine, eigener experimenteller Skriptlaufzeit und nativer Oberfläche. Dieses zusammenhängende Quellprojekt enthält Beispiele, Tests und Windows-Bauskripte. Es ist noch kein vollständig kompatibler Alltagsbrowser und enthält keine geprüfte Windows-EXE.
+Ein Windows-Dokumentbrowser mit einer selbst geschriebenen Engine, eigener experimenteller Skriptlaufzeit und nativer Oberfläche. Dieses zusammenhängende Quellprojekt enthält Beispiele, Tests und Windows-Bauskripte. Der native x64-Build und die automatisierten Windows-Tests sind erfolgreich; es ist noch kein vollständig kompatibler Alltagsbrowser.
+
+[Windows-x64-ZIP herunterladen](https://github.com/shedowe19/Causalis/actions/runs/37914071885/artifacts/11608871200), entpacken und `causalis.exe` starten. Der [geprüfte Run](https://github.com/shedowe19/Causalis/actions/runs/37914071885) enthält beide Windows-Builds und Testberichte. Die Downloadartefakte werden bis zum 23. Oktober 2026 aufbewahrt; danach den Workflow erneut starten.
 
 HTML-Verarbeitung, einfache CSS-Kaskade, Textlayout, Display-Liste, Dokumentadapter und Skriptinterpreter entstehen in unserem eigenen C++20-Code. Chromium, Blink, Gecko, WebKit, CEF, WebView und fremde JavaScript-Interpreter werden nicht eingebettet. Windows GDI liefert die Grafikausgabe und WinHTTP den optionalen HTTPS-Transport.
 
@@ -12,9 +14,9 @@ HTML-Verarbeitung, einfache CSS-Kaskade, Textlayout, Display-Liste, Dokumentadap
 | Eigene Skriptlaufzeit | JavaScript-Syntax mit Variablen, Ausdrücken, Schleifen, benannten Funktionen, Konsole und sicheren #id-Änderungen; portabel getestet; ausdrücklich lokale Ausführung |
 | Dokumentmodell | Quelltext erhalten, Titel/Text inspizieren, begrenzte sichere Mutationen und passive Leseansicht; portabel getestet |
 | Seitenstände | Passive .causalis-Dateien, erneute Bereinigung beim Import, begrenzter Textvergleich mit Hinweis auf sonstige Textänderungen; portabel getestet |
-| Windows-Oberfläche | Tabs, Zurück/Vorwärts, drei Arbeitsbereiche, Lesezeichen, Suche, Leseansicht, Quellinspektion, Seitenstände und Projektdateien; Quellcode geprüft, Windows-Ausführung offen |
+| Windows-Oberfläche | Tabs, Zurück/Vorwärts, drei Arbeitsbereiche, Lesezeichen, Suche, Leseansicht, Quellinspektion, Seitenstände und Projektdateien; MSVC-Build und automatisierter Win32-Test auf beiden Windows-Runnern bestanden; interaktive Bedienprüfung offen |
 | HTTPS | Optionaler WinHTTP-Dokumentzugriff, beim Start aus; keine aktiven Seiten-Skripte oder Subressourcen; Windows-Ausführung offen |
-| Bitwarden/Vaultwarden | Begrenzte Verwaltung über separat installierte offizielle bw.exe: Serverwahl, Status, Sync, Sperren; portable Richtlinien getestet, Windows-Bridge ungetestet |
+| Bitwarden/Vaultwarden | Begrenzte Verwaltung über separat installierte offizielle bw.exe: Serverwahl, Status, Sync, Sperren; portable Richtlinien getestet und Windows-Bridge kompiliert; echter CLI-/Tresorzugriff ungetestet |
 
 Die besonderen Funktionen verbinden die Dokumentquelle mit ihrer Darstellung: „Warum?“ zeigt die Herkunft gezeichneter Elemente; dieselbe Quelle erzeugt eine passive Leseansicht und vergleichbare Seitenstände. Arbeitsbereiche halten Dokument-Tabs und CLI-Appdaten getrennt. Ein vollständiges Ursachenprotokoll und isolierte Webidentitäten sind weitere Entwicklungsziele.
 
@@ -31,7 +33,7 @@ ctest --test-dir build -C Release --output-on-failure
 
 Alternativ kompiliert windows/build.ps1 das Programm direkt mit MSVC. Bedienung und ein Windows-Prüfablauf stehen in [windows/README.md](windows/README.md). Das eingebaute Beispieldokument funktioniert ohne externe Dateien; samples/script-demo.html zeigt die ausdrücklich ausgelöste Skriptausführung.
 
-Das Projekt enthält auch [.github/workflows/windows.yml](.github/workflows/windows.yml): native Builds und Tests auf windows-latest und windows-2022, ein automatischer Win32-Starttest und EXE-Downloads nach erfolgreicher Prüfung. Einrichtung und tatsächliche Prüfabdeckung stehen in [docs/CI.md](docs/CI.md). Der Workflow ist vorbereitet; ein abgeschlossener GitHub-Run liegt noch nicht vor.
+Das Projekt enthält auch [.github/workflows/windows.yml](.github/workflows/windows.yml): native Builds und Tests auf windows-latest und windows-2022, ein automatischer Win32-Starttest und EXE-Downloads nach erfolgreicher Prüfung. Am 9. Oktober 2026 bestanden beide Jobs jeweils 7/7 CTest-Ziele und alle 11 CLI-Prüfungen für Quellcommit `3b9d6291d9b6ac8b13e7cc48092f1c68d512def6`. Einrichtung, Runlinks und tatsächliche Prüfabdeckung stehen in [docs/CI.md](docs/CI.md).
 
 ## Portablen Kern prüfen
 
