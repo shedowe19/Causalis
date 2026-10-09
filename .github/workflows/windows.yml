@@ -1,0 +1,81 @@
+name: Windows build and test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    name: Windows x64 (${{ matrix.runner }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [windows-latest, windows-2022]
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Configure native MSVC build
+        run: cmake -S . -B build -A x64 -DBUILD_TESTING=ON
+
+      - name: Build browser and tests
+        run: cmake --build build --config Release --parallel 2
+
+      - name: Run core and native Windows tests
+        run: ctest --test-dir build -C Release --output-on-failure --no-tests=error --timeout 60 --output-junit "$PWD/build/test-results.xml"
+
+      - name: Validate the built CLI
+        run: python tools/verify_cli.py build/Release/causalis-cli.exe --report build/cli-checks-report.json
+
+      - name: Prepare downloadable application
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item build/Release/causalis.exe dist/
+          Copy-Item build/Release/causalis-cli.exe dist/
+          Copy-Item README.md, VALIDATION.md dist/
+          Copy-Item samples dist/samples -Recurse
+          Copy-Item docs dist/docs -Recurse
+          Copy-Item windows/README.md dist/WINDOWS.md
+          $commit = git rev-parse HEAD
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot identify the tested commit.' }
+          "Tested source commit: $commit" | Set-Content dist/BUILD.txt
+          Get-FileHash dist/causalis.exe, dist/causalis-cli.exe -Algorithm SHA256 |
+            ForEach-Object { "$($_.Hash)  $(Split-Path $_.Path -Leaf)" } |
+            Set-Content dist/SHA256SUMS.txt
+
+      - name: Upload application after successful tests
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: Causalis-${{ matrix.runner }}-x64
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload test reports even on failure
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: Causalis-test-reports-${{ matrix.runner }}
+          path: |
+            build/test-results.xml
+            build/cli-checks-report.json
+            build/causalis-smoke-report.txt
+            build/Testing/Temporary/LastTest.log
+            build/Testing/Temporary/LastTestsFailed.log
+          if-no-files-found: warn
+          retention-days: 14

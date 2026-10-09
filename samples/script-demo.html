@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><title>Causalis Skriptlabor</title>
+<style>body{margin:24px;font-size:18px;color:#25304a;}h1{font-size:32px;color:#6644aa;}#result{background:#e9e4fa;padding:18px;font-size:24px;}</style></head>
+<body><h1>Unsere eigene Skriptlaufzeit</h1>
+<p>Dieses lokale Dokument verwendet das überprüfte Sprach-Subset. Die Ausführung wird ausdrücklich eingeschaltet.</p>
+<div id="result">Skript noch nicht ausgeführt.</div>
+<p>Im Windows-Fenster: Engine → Lokale Skripte einmal ausführen. In der CLI: --run-scripts.</p>
+<script>
+let total = 0;
+for (let i = 1; i <= 5; i = i + 1) { total = total + i; }
+console.log("Summe", total);
+document.querySelector("#result").textContent = "Berechnet: " + total;
+document.querySelector("#result").style.color = "#305080";
+</script></body></html>
